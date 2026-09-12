@@ -1,0 +1,225 @@
+- id: '1746171015275'
+  alias: WP WW Solltemp 2 beim Einspeisen Einschalten
+  description: 'Steigt die Einspeiseleistung über 2800 W (obere Schwelle Hysterese
+    WP) wird das Relay für die Solltemperatur 2 eingeschaltet.
+
+    Hinweis: Zusätzlich wird noch geprüft, ob die Schwelle für 10 min überschritten
+    wurde. Damit wird sichergestellt, dass nicht sofort wieder bei einer Wolke oder
+    zusätzlichen Verbrauchern ausgeschaltet wird, weil die untere Schwelle unterschritten
+    wurde.
+
+    Hinweis: Triggerbedigung für Einschalten und Ausschalten sind aufgrund der Hysterese
+    unterschiedlich, deshalb sind zwei Automatisierungen notwendig.'
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.tibber_pulse_myhome_einspeiseleistung
+    above: 2800
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+  conditions:
+  - condition: state
+    entity_id: switch.shellypro3_fce8c0dbe7a8_switch_0
+    state: 'off'
+  actions:
+  - action: switch.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: switch.shellypro3_fce8c0dbe7a8_switch_0
+  - device_id: 98399d941e0e5d2ca6aff0b27b4493cc
+    domain: mobile_app
+    type: notify
+    message: WP WW Solltemperatur 2 eingeschaltet
+    title: Notify Boiled Water Setpoint Temp 2 activated
+  mode: single
+- id: '1746171484230'
+  alias: WP WW Solltemp 2 beim Einspeisen Ausschalten
+  description: 'Sinkt die Einspeiseleistung unter 200 W (untere Schwelle Hysterese
+    WP) wird das Relay für die Solltemperatur 2 wieder ausgeschaltet.
+
+    Hinweis: Bei günstigem Strompreis wird das Relay nicht ausgeschaltet.
+
+    Hinweis: Triggerbedigung für Einschalten und Ausschalten sind aufgrund der Hysterese
+    unterschiedlich, deshalb sind zwei Automatisierungen notwendig.'
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.tibber_pulse_myhome_einspeiseleistung
+    below: 200
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+  conditions:
+  - condition: state
+    entity_id: switch.shellypro3_fce8c0dbe7a8_switch_0
+    state: 'on'
+  - condition: numeric_state
+    entity_id: sensor.price_current_float
+    above: sensor.price_threshold_low_float
+  actions:
+  - action: switch.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: switch.shellypro3_fce8c0dbe7a8_switch_0
+  - device_id: 98399d941e0e5d2ca6aff0b27b4493cc
+    domain: mobile_app
+    type: notify
+    title: Notify Boiled Water Setpoint Temp 2 deactivated
+    message: WP WW Solltemperatur 2 ausgeschaltet
+  mode: single
+- id: '1746264771707'
+  alias: WP Abschaltbetrieb bei hohem Strompreis
+  description: 'Schaltet das Shelly Relais für den Abschaltbetrieb ein, wenn der aktuelle
+    Tibber-Strompreis 20 % über dem 24h-Durchschnitt liegt, und wieder aus, wenn er
+    darunter fällt.
+
+    Hinweis: Sollte das Shelly Relay für WW Solltemperatur 2 eingeschaltet sein, dann
+    wird der Abschaltbetrieb nicht angefordert, da genügend Einspeiseleistung für
+    den Betrieb der Wärmepumpe zur Verfügung steht.'
+  triggers:
+  - entity_id: sensor.price_current_float
+    trigger: state
+  actions:
+  - choose:
+    - conditions:
+      - condition: and
+        conditions:
+        - condition: state
+          entity_id: switch.shellypro3_fce8c0dbe7a8_switch_1
+          state: 'off'
+        - condition: numeric_state
+          entity_id: sensor.price_current_float
+          above: sensor.price_threshold_high_float
+        - condition: state
+          entity_id: switch.shellypro3_fce8c0dbe7a8_switch_0
+          state: 'off'
+      sequence:
+      - target:
+          entity_id: switch.shellypro3_fce8c0dbe7a8_switch_1
+        action: switch.turn_on
+        data: {}
+      - device_id: 98399d941e0e5d2ca6aff0b27b4493cc
+        domain: mobile_app
+        type: notify
+        title: Hoher Strompreis - WP ausgeschaltet
+        message: "WP Standby eingeschaltet. Aktuell: {{ states('sensor.price_current_float') | float(0) | round(3) }} EUR/kWh, Schwelle: {{ states('sensor.price_threshold_high_float') | float(0) | round(3) }} EUR/kWh"
+    - conditions:
+      - condition: and
+        conditions:
+        - condition: state
+          entity_id: switch.shellypro3_fce8c0dbe7a8_switch_1
+          state: 'on'
+        - condition: or
+          conditions:
+          - condition: numeric_state
+            entity_id: sensor.price_current_float
+            below: sensor.price_threshold_high_float
+          - condition: state
+            entity_id: switch.shellypro3_fce8c0dbe7a8_switch_0
+            state: 'on'
+      sequence:
+      - target:
+          entity_id: switch.shellypro3_fce8c0dbe7a8_switch_1
+        action: switch.turn_off
+        data: {}
+      - device_id: 98399d941e0e5d2ca6aff0b27b4493cc
+        domain: mobile_app
+        type: notify
+        title: Normaler Strompreis - WP eingeschaltet
+        message: "WP Standby ausgeschaltet. Aktuell: {{ states('sensor.price_current_float') | float(0) | round(3) }} EUR/kWh, Schwelle: {{ states('sensor.price_threshold_high_float') | float(0) | round(3) }} EUR/kWh"
+  mode: single
+- id: '1767470950099'
+  alias: WP WW Solltemp 2 bei niedrigem Strompreis
+  description: 'Schaltet das Shelly Relais für WW Solltemperatur 2 ein, wenn der aktuelle
+    Tibber-Strompreis 20 % unter dem 24h-Durchschnitt liegt, und wieder aus, wenn
+    er wieder darüber ist.
+
+    Hinweis: Das Relay wird nur ausgeschaltet, wenn die Einspeiseleistung kleiner
+    200 W (unterere Schwelle Hysterie Wärmepumpe). Damit wird sichergestellt, dass
+    bei genügend Sonnenertrag weiterhin sehr warmes Wasser aufbereitet wird, auch
+    wenn der Strompreis steigt.'
+  triggers:
+  - entity_id: sensor.price_current_float
+    trigger: state
+  actions:
+  - choose:
+    - conditions:
+      - condition: and
+        conditions:
+        - condition: state
+          entity_id: switch.shellypro3_fce8c0dbe7a8_switch_0
+          state: 'off'
+        - condition: numeric_state
+          entity_id: sensor.price_current_float
+          below: sensor.price_threshold_low_float
+      sequence:
+      - target:
+          entity_id: switch.shellypro3_fce8c0dbe7a8_switch_0
+        action: switch.turn_on
+        data: {}
+      - device_id: 98399d941e0e5d2ca6aff0b27b4493cc
+        domain: mobile_app
+        type: notify
+        title: WP WW Solltemperatur 2 eingeschaltet
+        message: WP WW Solltemperatur 2 eingeschaltet - Niedriger Strompreis
+    - conditions:
+      - condition: and
+        conditions:
+        - condition: state
+          entity_id: switch.shellypro3_fce8c0dbe7a8_switch_0
+          state: 'on'
+        - condition: numeric_state
+          entity_id: sensor.price_current_float
+          above: sensor.price_threshold_low_float
+        - condition: numeric_state
+          entity_id: sensor.tibber_pulse_myhome_einspeiseleistung
+          below: 200
+      sequence:
+      - target:
+          entity_id: switch.shellypro3_fce8c0dbe7a8_switch_0
+        action: switch.turn_off
+        data: {}
+      - device_id: 98399d941e0e5d2ca6aff0b27b4493cc
+        domain: mobile_app
+        type: notify
+        title: WP WW Solltemperatur 2 ausgeschaltet
+        message: WP WW Solltemperatur 2 ausgeschaltet - Strompreis wieder gestiegen
+  mode: single
+# Alte Lösung - triggert nur bei Zustandswechsel zu unavailable, nicht bei anhaltendem unavailable
+# - id: '1767470950100'
+#   alias: Tibber Strompreis Reload
+#   description: Lädt Tibber Integration neu wenn Strompreis länger als 5 Min unavailable
+#   triggers:
+#     - entity_id: sensor.myhome_strompreis
+#       to: "unavailable"
+#       for:
+#         minutes: 5
+#       trigger: state
+#   conditions: []
+#   actions:
+#     - action: homeassistant.reload_config_entry
+#       data:
+#         entry_id: 01KMDR80A1XYHV165K24S86W4P
+#   mode: single
+- id: '1767470950100'
+  alias: Tibber Strompreis Reload
+  description: Lädt Tibber Integration neu wenn Strompreis länger als 5 Min unavailable. Prüft alle 5 Minuten ob Sensor unavailable ist.
+  triggers:
+    - trigger: time_pattern
+      minutes: "/5"
+  conditions:
+    - condition: state
+      entity_id: sensor.myhome_strompreis
+      state: unavailable
+      for:
+        minutes: 5
+  actions:
+    - action: homeassistant.reload_config_entry
+      data:
+        entry_id: 01KMDR80A1XYHV165K24S86W4P
+  mode: single

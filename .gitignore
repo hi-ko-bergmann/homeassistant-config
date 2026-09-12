@@ -1,0 +1,19 @@
+# Home Assistant runtime and generated data
+config/.storage/
+config/.cache/
+config/.cloud/
+config/.ha_run.lock
+config/.HA_VERSION
+config/*.db
+config/*.db-*
+config/*.db.*
+config/*.log*
+config/backups/
+config/secrets.yaml
+
+# Python virtualenvs / caches
+__pycache__/
+.venv/
+
+# OS files
+.DS_Store

@@ -1,0 +1,459 @@
+- name: varta
+  type: tcp
+  host: 192.168.178.23   # IP deiner Varta
+  port: 502
+  delay: 3
+  timeout: 10
+  retries: 5
+  message_wait_milliseconds: 2000
+  scan_interval: 120  # Nur alle 2 Minuten Werte abfragen, um Kollision mit Solarwatt Energy Manager zu vermeiden
+  sensors:
+### EMS Software Version - not for Varta link
+#      - name: mb_varta_sw_version_EMS
+#        unique_id: varta_SW_version_EMS
+#        slave: 255
+#        address: 1000
+#        count: 17
+#        data_type: string
+### ENS Software Version - not for Varta link
+#      - name: mb_varta_sw_version_ENS
+#        unique_id: varta_SW_version_ENS
+#        slave: 255
+#        address: 1017
+#        count: 17
+#        data_type: string
+### Software Version - not for Varta link
+#      - name: mb_varta_sw_version_inverter
+#        unique_id: varta_SW_version_inverter
+#        slave: 255
+#        address: 1034
+#        count: 17
+#        data_type: string
+### Table version
+#      - name: mb_varta_table_version
+#        unique_id: varta_table_version
+#        slave: 255
+#        address: 1051
+#        data_type: uint16
+### timestamp
+#      - name: mb_varta_timestamp_lower
+#        unique_id: varta_timestamp_lower
+#        slave: 255
+#        address: 1052
+#        data_type: uint16
+### timestamp
+#      - name: mb_varta_timestamp_higher
+#        unique_id: varta_timestamp_higher
+#        slave: 255
+#        address: 1053
+#        data_type: uint16
+### Serial Number
+#      - name: mb_varta_serial
+#        unique_id: varta_serial_number
+#        slave: 255
+#        address: 1054
+#        count: 10
+#        data_type: string
+### Number of Battery Modules installed
+#      - name: mb_varta_installed_batteries
+#        unique_id: varta_installed_batteries
+#        slave: 255
+#        address: 1064
+#        data_type: uint16
+### State
+    - name: mb_varta_state
+      unique_id: mb_varta_state
+      slave: 255
+      address: 1065
+      data_type: uint16
+      unit_of_measurement: "State"
+### Active Power - positive:charge / negative: discharge
+    - name: mb_varta_active_power
+      unique_id: varta_active_power
+      slave: 255
+      address: 1066
+      data_type: int16
+      device_class: power
+      unit_of_measurement: "W"
+### Apparent Power - positive:charge / negative: discharge
+#      - name: mb_varta_apparent_power
+#        unique_id: varta_apparent_power
+#        slave: 255
+#        address: 1067
+#        data_type: int16
+#        device_class: apparent_power
+#        unit_of_measurement: "VA"
+### State of Charge
+    - name: mb_varta_SOC
+      unique_id: varta_soc
+      slave: 255
+      address: 1068
+      data_type: uint16
+      device_class: battery
+      unit_of_measurement: "%"
+### Energy Counter lower word
+#      - name: mb_varta_energy_low
+#        unique_id: varta_energy_low
+#        slave: 255
+#        address: 1069
+#        data_type: uint16
+#        state_class: total_increasing
+#        device_class: energy
+#        unit_of_measurement: "Wh"
+### Energy Counter higher word
+#      - name: mb_varta_energy_high
+#        unique_id: varta_energy_high
+#        slave: 255
+#        address: 1070
+#        data_type: uint16
+#        state_class: total_increasing
+#        device_class: energy
+#        unit_of_measurement: "Wh"
+### Installed capacity
+#      - name: mb_varta_capacity
+#        unique_id: varta_capacity
+#        slave: 255
+#        address: 1071
+#        data_type: uint16
+#        scale: 10
+#        device_class: energy
+#        unit_of_measurement: "Wh"
+### Grid Power
+    - name: mb_varta_grid_power
+      unique_id: varta_grid_power
+      slave: 255
+      address: 1078
+      data_type: int16
+      device_class: power
+      unit_of_measurement: "W"
+### Ladeenergie
+#      - name: mb_varta_charging_energy
+#        unique_id: varta_charging_energy
+#        slave: 255
+#        address: 1085
+#        data_type: uint16
+#        device_class: energy
+#        unit_of_measurement: "Wh"
+### Entladeenergie
+#      - name: mb_varta_discharging_energy
+#        unique_id: varta_discharging_energy
+#        slave: 255
+#        address: 1086
+#        data_type: uint16
+#        device_class: energy
+#        unit_of_measurement: "Wh"
+
+- name: kaco
+  type: tcp
+  host: 192.168.178.35   # Kaco blueplanet 10.0NX3 (SN: 12077639)
+  port: 502
+  delay: 1
+  timeout: 5
+  retries: 3
+  scan_interval: 60  # Erhöht auf 60 Sekunden für schnelleren Start
+  sensors:
+### Raw AC Power Value (Register 40084)
+    - name: mb_kaco_ac_power_raw
+      unique_id: kaco_ac_power_raw
+      slave: 3
+      address: 40084
+      data_type: uint16
+### AC Power Scale Factor (Register 40085)
+    - name: mb_kaco_ac_power_sf
+      unique_id: kaco_ac_power_sf
+      slave: 3
+      address: 40085
+      data_type: int16
+### Raw Total Energy Value (Register 40094)
+    - name: mb_kaco_total_energy_raw
+      unique_id: kaco_total_energy_raw
+      slave: 3
+      address: 40094
+      data_type: uint32
+### Total Energy Scale Factor (Register 40096)
+    - name: mb_kaco_total_energy_sf
+      unique_id: kaco_total_energy_sf
+      slave: 3
+      address: 40096
+      data_type: int16
+#### AC Voltage Phase A (Register 40080)
+#    - name: mb_kaco_voltage_l1
+#      unique_id: kaco_voltage_l1
+#      slave: 3
+#      address: 40080
+#      data_type: uint16
+#      scale: 0.1
+#      precision: 1
+#      device_class: voltage
+#      state_class: measurement
+#      unit_of_measurement: "V"
+#### AC Voltage Phase B (Register 40081)
+#    - name: mb_kaco_voltage_l2
+#      unique_id: kaco_voltage_l2
+#      slave: 3
+#      address: 40081
+#      data_type: uint16
+#      scale: 0.1
+#      precision: 1
+#      device_class: voltage
+#      state_class: measurement
+#      unit_of_measurement: "V"
+#### AC Voltage Phase C (Register 40082)
+#    - name: mb_kaco_voltage_l3
+#      unique_id: kaco_voltage_l3
+#      slave: 3
+#      address: 40082
+#      data_type: uint16
+#      scale: 0.1
+#      precision: 1
+#      device_class: voltage
+#      state_class: measurement
+#      unit_of_measurement: "V"
+#### AC Current Phase A (Register 40073)
+#    - name: mb_kaco_current_l1
+#      unique_id: kaco_current_l1
+#      slave: 3
+#      address: 40073
+#      data_type: uint16
+#      scale: 0.01
+#      precision: 2
+#      device_class: current
+#      state_class: measurement
+#      unit_of_measurement: "A"
+#### AC Current Phase B (Register 40074)
+#    - name: mb_kaco_current_l2
+#      unique_id: kaco_current_l2
+#      slave: 3
+#      address: 40074
+#      data_type: uint16
+#      scale: 0.01
+#      precision: 2
+#      device_class: current
+#      state_class: measurement
+#      unit_of_measurement: "A"
+#### AC Current Phase C (Register 40075)
+#    - name: mb_kaco_current_l3
+#      unique_id: kaco_current_l3
+#      slave: 3
+#      address: 40075
+#      data_type: uint16
+#      scale: 0.01
+#      precision: 2
+#      device_class: current
+#      state_class: measurement
+#      unit_of_measurement: "A"
+#### DC Voltage String 1 (Register 40563)
+#    - name: mb_kaco_dc_voltage_1
+#      unique_id: kaco_dc_voltage_1
+#      slave: 3
+#      address: 40563
+#      data_type: uint16
+#      scale: 0.1
+#      precision: 1
+#      device_class: voltage
+#      state_class: measurement
+#      unit_of_measurement: "V"
+#### DC Current String 1 (Register 40562)
+#    - name: mb_kaco_dc_current_1
+#      unique_id: kaco_dc_current_1
+#      slave: 3
+#      address: 40562
+#      data_type: uint16
+#      scale: 0.01
+#      precision: 2
+#      device_class: current
+#      state_class: measurement
+#      unit_of_measurement: "A"
+### DC Power String 1 (Register 40564)
+    - name: mb_kaco_dc_power_1
+      unique_id: kaco_dc_power_1
+      slave: 3
+      address: 40564
+      data_type: uint16
+      scale: 10
+      device_class: power
+      state_class: measurement
+      unit_of_measurement: "W"
+#### DC Voltage String 2 (Register 40588)
+#    - name: mb_kaco_dc_voltage_2
+#      unique_id: kaco_dc_voltage_2
+#      slave: 3
+#      address: 40588
+#      data_type: uint16
+#      scale: 0.1
+#      precision: 1
+#      device_class: voltage
+#      state_class: measurement
+#      unit_of_measurement: "V"
+#### DC Current String 2 (Register 40587)
+#    - name: mb_kaco_dc_current_2
+#      unique_id: kaco_dc_current_2
+#      slave: 3
+#      address: 40587
+#      data_type: uint16
+#      scale: 0.01
+#      precision: 2
+#      device_class: current
+#      state_class: measurement
+#      unit_of_measurement: "A"
+### DC Power String 2 (Register 40589)
+    - name: mb_kaco_dc_power_2
+      unique_id: kaco_dc_power_2
+      slave: 3
+      address: 40589
+      data_type: uint16
+      scale: 10
+      device_class: power
+      state_class: measurement
+      unit_of_measurement: "W"
+### Cabinet Temperature (Register 40294)
+    - name: mb_kaco_temperature
+      unique_id: kaco_temperature
+      slave: 3
+      address: 40294
+      data_type: uint16
+      scale: 0.1
+      precision: 1
+      device_class: temperature
+      state_class: measurement
+      unit_of_measurement: "°C"
+#### Daily Energy (Tagesertrag)
+#    - name: mb_kaco_daily_energy
+#      unique_id: kaco_daily_energy
+#      slave: 3
+#      address: 502
+#      data_type: uint32
+#      swap: word
+#      scale: 0.1
+#      precision: 1
+#      device_class: energy
+#      state_class: total_increasing
+#      unit_of_measurement: "kWh"
+#### Total Energy (Gesamtertrag)
+#    - name: mb_kaco_total_energy
+#      unique_id: kaco_total_energy
+#      slave: 3
+#      address: 504
+#      data_type: uint32
+#      swap: word
+#      scale: 0.1
+#      precision: 1
+#      device_class: energy
+#      state_class: total_increasing
+#      unit_of_measurement: "kWh"
+#### DC Power (DC-Leistung)
+#    - name: mb_kaco_dc_power
+#      unique_id: kaco_dc_power
+#      slave: 3
+#      address: 110
+#      data_type: uint32
+#      swap: word
+#      device_class: power
+#      state_class: measurement
+#      unit_of_measurement: "W"
+#### AC Voltage L1
+#    - name: mb_kaco_ac_voltage_l1
+#      unique_id: kaco_ac_voltage_l1
+#      slave: 3
+#      address: 106
+#      data_type: uint16
+#      scale: 0.1
+#      precision: 1
+#      device_class: voltage
+#      state_class: measurement
+#      unit_of_measurement: "V"
+#### AC Voltage L2
+#    - name: mb_kaco_ac_voltage_l2
+#      unique_id: kaco_ac_voltage_l2
+#      slave: 3
+#      address: 107
+#      data_type: uint16
+#      scale: 0.1
+#      precision: 1
+#      device_class: voltage
+#      state_class: measurement
+#      unit_of_measurement: "V"
+#### AC Voltage L3
+#    - name: mb_kaco_ac_voltage_l3
+#      unique_id: kaco_ac_voltage_l3
+#      slave: 3
+#      address: 108
+#      data_type: uint16
+#      scale: 0.1
+#      precision: 1
+#      device_class: voltage
+#      state_class: measurement
+#      unit_of_measurement: "V"
+#### AC Current L1
+#    - name: mb_kaco_ac_current_l1
+#      unique_id: kaco_ac_current_l1
+#      slave: 3
+#      address: 109
+#      data_type: uint16
+#      scale: 0.01
+#      precision: 2
+#      device_class: current
+#      state_class: measurement
+#      unit_of_measurement: "A"
+#### AC Current L2
+#    - name: mb_kaco_ac_current_l2
+#      unique_id: kaco_ac_current_l2
+#      slave: 3
+#      address: 110
+#      data_type: uint16
+#      scale: 0.01
+#      precision: 2
+#      device_class: current
+#      state_class: measurement
+#      unit_of_measurement: "A"
+#### AC Current L3
+#    - name: mb_kaco_ac_current_l3
+#      unique_id: kaco_ac_current_l3
+#      slave: 3
+#      address: 111
+#      data_type: uint16
+#      scale: 0.01
+#      precision: 2
+#      device_class: current
+#      state_class: measurement
+#      unit_of_measurement: "A"
+#### DC Voltage String 1
+#    - name: mb_kaco_dc_voltage_1
+#      unique_id: kaco_dc_voltage_1
+#      slave: 3
+#      address: 112
+#      data_type: uint16
+#      scale: 0.1
+#      precision: 1
+#      device_class: voltage
+#      state_class: measurement
+#      unit_of_measurement: "V"
+#### DC Current String 1
+#    - name: mb_kaco_dc_current_1
+#      unique_id: kaco_dc_current_1
+#      slave: 3
+#      address: 114
+#      data_type: uint16
+#      scale: 0.01
+#      precision: 2
+#      device_class: current
+#      state_class: measurement
+#      unit_of_measurement: "A"
+#### Inverter Temperature
+#    - name: mb_kaco_temperature
+#      unique_id: kaco_temperature
+#      slave: 3
+#      address: 103
+#      data_type: int16
+#      scale: 0.1
+#      precision: 1
+#      device_class: temperature
+#      state_class: measurement
+#      unit_of_measurement: "°C"
+#### Operating Status
+#    - name: mb_kaco_status
+#      unique_id: kaco_status
+#      slave: 3
+#      address: 100
+#      data_type: uint16
+#      state_class: measurement

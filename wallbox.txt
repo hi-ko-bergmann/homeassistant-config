@@ -1,0 +1,112 @@
+Wallbox A011KP1-E-2-WO (Softwareversion 1.30).
+
+REG_L1_VOLTAGE      = 0x1009
+REG_L2_VOLTAGE      = 0x100A
+REG_L3_VOLTAGE      = 0x100B
+
+REG_L1_CURRENT      = 0x100C
+REG_L2_CURRENT      = 0x100D
+REG_L3_CURRENT      = 0x100E
+REG_ACTIVE_POWER    = 0x100F
+REG_LOCK_STATUS.    = 0x1010
+REG_PHASE_SEQUENCE  = 0x1011
+REG_MAX_POWER       = 0x1012 (in W/100, wurde ws. als 11040 W --> 110 eingestellt als max Ladeleistung in Solarwatt App)
+
+
+
+STOP_REASON_MAP     = 0x1003
+STOP_REASON_MAP  = {
+    0: "none",           1: "command",          2: "time_completed",
+    3: "s2_timeout",     4: "pause_timeout",    5: "emergency_stop",
+    6: "cp_abnormal",    7: "connector_pulled", 8: "ac_contactor",
+    9: "lock_abnormal", 10: "card_reader",      11: "overcurrent",
+    12: "overvoltage",  13: "undervoltage",     14: "port_overtemp",
+    15: "leakage",      16: "n_line_reversed",  17: "freq_abnormal",
+    18: "stop_button",  19: "breaker",          20: "phase_loss",
+    21: "pe_abnormal",  22: "ext_meter",        23: "ambient_overtemp",
+    24: "metering_chip",25: "access_control",   26: "pbox_phase_switch",
+    27: "energy_limit",
+}
+
+REG_CP_STATUS       = 0x1004 (Control Pilot (CP))
+CP_STATUS_MAP = {
+    0: "idle",
+    1: "connected",
+    2: "ready",
+    3: "charging",
+    4: "paused",
+    5: "finished",
+    6: "fault",
+    7: "reserved",
+    8: "locked",
+}
+REG_CC_STATUS       = 0x1006 (Contactor Control Status)
+CC_STATUS_MAP = {
+    0: "Schütz offen",
+    1: "Schütz geschlossen",
+    2: "Schaltvorgang läuft",
+    sonst: "Fehler",
+}
+0
+STOP_REASON_MAP  = {
+    0: "none",           1: "command",          2: "time_completed",
+    3: "s2_timeout",     4: "pause_timeout",    5: "emergency_stop",
+    6: "cp_abnormal",    7: "connector_pulled", 8: "ac_contactor",
+    9: "lock_abnormal", 10: "card_reader",      11: "overcurrent",
+    12: "overvoltage",  13: "undervoltage",     14: "port_overtemp",
+    15: "leakage",      16: "n_line_reversed",  17: "freq_abnormal",
+    18: "stop_button",  19: "breaker",          20: "phase_loss",
+    21: "pe_abnormal",  22: "ext_meter",        23: "ambient_overtemp",
+    24: "metering_chip",25: "access_control",   26: "pbox_phase_switch",
+    27: "energy_limit",
+}
+
+REG_STATUS          = 0x1003
+REG_CP_STATUS       = 0x1004
+REG_CC_STATUS       = 0x1005
+REG_PORT_TEMP       = 0x1006
+
+ = 0x1003
+
+
+
+Beim Laden:
+ -- Polling slave 1... Ctrl-C to stop)
+[4099]: 	0
+[4100]: 	3
+[4101]: 	3
+[4102]: 	1
+[4103]: 	65535 (-1)
+
+-- Polling slave 1... Ctrl-C to stop)
+[4097]: 	1
+[4098]: 	286
+[4099]: 	0
+[4100]: 	3
+[4101]: 	3
+[4102]: 	1
+[4103]: 	65535 (-1)
+[4104]: 	987
+[4105]: 	2244
+[4106]: 	2277
+[4107]: 	2283
+[4108]: 	141
+[4109]: 	0
+[4110]: 	0
+[4111]: 	31
+[4112]: 	1
+[4113]: 	3
+[4114]: 	110
+[4115]: 	14
+[4116]: 	160
+
+
+Nach dem Abklemmen:
+-- Polling slave 1... Ctrl-C to stop)
+[4099]: 	7
+[4100]: 	0
+[4101]: 	1
+[4102]: 	0
+[4103]: 	65535 (-1)
+
+

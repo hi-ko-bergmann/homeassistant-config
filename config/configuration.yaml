@@ -1,0 +1,149 @@
+
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+modbus: !include modbus.yaml
+
+# Template sensors for electricity price calculations
+template:
+  - sensor:
+      - name: "Price Current Float"
+        unique_id: price_current_float
+        state: >
+          {% set current = states('sensor.myhome_strompreis') %}
+          {% if current not in ['unavailable', 'unknown'] %}
+            {{ current | float(0) }}
+          {% else %}
+            {{ states('sensor.price_current_float') | float(0) }}
+          {% endif %}
+        unit_of_measurement: "EUR/kWh"
+        device_class: monetary
+        
+      - name: "Price Mean Float"
+        unique_id: price_mean_float
+        state: "{{ states('sensor.strompreis_24h_durchschnitt') | float(0) }}"
+        unit_of_measurement: "EUR/kWh"
+        device_class: monetary
+        availability: "{{ states('sensor.strompreis_24h_durchschnitt') not in ['unavailable', 'unknown'] }}"
+        
+      - name: "Price Threshold High Float"
+        unique_id: price_threshold_high_float
+        state: "{{ states('sensor.strompreis_24h_durchschnitt') | float(0) * 1.2 }}"
+        unit_of_measurement: "EUR/kWh"
+        device_class: monetary
+        availability: "{{ states('sensor.strompreis_24h_durchschnitt') not in ['unavailable', 'unknown'] }}"
+
+      - name: "Price Threshold Low Float"
+        unique_id: price_threshold_low_float
+        state: "{{ states('sensor.strompreis_24h_durchschnitt') | float(0) * 0.8 }}"
+        unit_of_measurement: "EUR/kWh"
+        device_class: monetary
+        availability: "{{ states('sensor.strompreis_24h_durchschnitt') not in ['unavailable', 'unknown'] }}"
+
+      # Varta Battery - Calculated Sensors
+      - name: "Varta Input Power"
+        unique_id: varta_input_power
+        unit_of_measurement: "W"
+        state_class: measurement
+        device_class: power
+        state: >
+          {% if states('sensor.mb_varta_active_power') | float(0) >= 0 %}
+            {{ states('sensor.mb_varta_active_power') | float(0) }}
+          {% else %}
+            0
+          {% endif %}
+
+      - name: "Varta Output Power"
+        unique_id: varta_output_power
+        unit_of_measurement: "W"
+        state_class: measurement
+        device_class: power
+        state: >
+          {% if states('sensor.mb_varta_active_power') | float(0) < 0 %}
+            {{ states('sensor.mb_varta_active_power') | float(0) | abs }}
+          {% else %}
+            0
+          {% endif %}
+
+      - name: "Varta Status"
+        unique_id: varta_status
+        state: >
+          {% set mapper = {
+              '0': 'Busy',
+              '1': 'Run',
+              '2': 'Charge',
+              '3': 'Discharge',
+              '4': 'Standby',
+              '5': 'Error',
+              '6': 'Service',
+              '7': 'Islanding' } %}
+          {% set state = states('sensor.mb_varta_state') %}
+          {{ mapper[state] if state in mapper else 'Unknown' }}
+
+      # Kaco PV Inverter - Calculated Sensors
+      - name: "Kaco AC Power"
+        unique_id: kaco_ac_power_calculated
+        state: >
+          {% set raw = states('sensor.mb_kaco_ac_power_raw') | int(0) %}
+          {% set sf = states('sensor.mb_kaco_ac_power_sf') | int(0) %}
+          {% if raw not in [0, 65535] and sf not in [0, 65535, -32768] %}
+            {{ (raw * (10 ** sf)) | round(0) }}
+          {% else %}
+            0
+          {% endif %}
+        unit_of_measurement: "W"
+        device_class: power
+        state_class: measurement
+        availability: >
+          {{ states('sensor.mb_kaco_ac_power_raw') not in ['unavailable', 'unknown'] 
+             and states('sensor.mb_kaco_ac_power_sf') not in ['unavailable', 'unknown'] }}
+
+      - name: "Kaco Total Energy"
+        unique_id: kaco_total_energy_calculated
+        state: >
+          {% set raw = states('sensor.mb_kaco_total_energy_raw') | int(0) %}
+          {% set sf = states('sensor.mb_kaco_total_energy_sf') | int(0) %}
+          {% if raw > 0 and sf not in [65535, -32768] %}
+            {{ ((raw / 1000) * (10 ** sf)) | round(2) }}
+          {% else %}
+            {{ states('sensor.kaco_total_energy') | float(0) }}
+          {% endif %}
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state_class: total_increasing
+        availability: >
+          {{ states('sensor.mb_kaco_total_energy_raw') not in ['unavailable', 'unknown'] 
+             and states('sensor.mb_kaco_total_energy_sf') not in ['unavailable', 'unknown'] }}
+
+      - name: "Kaco DC Power Total"
+        unique_id: kaco_dc_power_total
+        state: >
+          {% set dc1 = states('sensor.mb_kaco_dc_power_1') | float(0) %}
+          {% set dc2 = states('sensor.mb_kaco_dc_power_2') | float(0) %}
+          {{ (dc1 + dc2) | round(0) }}
+        unit_of_measurement: "W"
+        device_class: power
+        state_class: measurement
+        availability: >
+          {{ states('sensor.mb_kaco_dc_power_1') not in ['unavailable', 'unknown'] 
+             and states('sensor.mb_kaco_dc_power_2') not in ['unavailable', 'unknown'] }}
+
+      - name: "Kaco Efficiency"
+        unique_id: kaco_efficiency
+        state: >
+          {% set ac = states('sensor.kaco_ac_power') | float(0) %}
+          {% set dc = states('sensor.kaco_dc_power_total') | float(0) %}
+          {% if dc > 100 %}
+            {{ ((ac / dc) * 100) | round(2) }}
+          {% else %}
+            0
+          {% endif %}
+        unit_of_measurement: "%"
+        state_class: measurement

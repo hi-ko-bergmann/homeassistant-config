@@ -1,0 +1,25 @@
+@startuml
+scale 1.5
+skinparam state {
+  FontSize 14
+  BackgroundColor LightBlue
+}
+
+state Abschaltbetrieb_AUS : Shelly Switch ist AUS
+state Abschaltbetrieb_EIN : Shelly Switch ist EIN
+
+
+Abschaltbetrieb_AUS --down--> Abschaltbetrieb_EIN : ÄnderungStrompreis() [(price_current > price_threshold_high) && (WP_WW_Solltemp2 == AUS)]
+note on link
+  HA Automation "WP Abschaltbetrieb bei hohem Strompreis"
+  Wärmepumpe abschalten bei hohem Strompreis
+  Nicht abschalten, wenn WW Solltemp 2 eingeschaltet ist, da genügend PV Leistung vorhanden
+end note
+
+Abschaltbetrieb_EIN --up--> Abschaltbetrieb_AUS : ÄnderungStrompreis() [price_current < price_threshold_high]
+note on link
+  HA Automation "WP Abschaltbetrieb bei hohem Strompreis"
+  Wärmepumpe bei normalem Strompreis wieder einschalten
+end note
+
+@enduml
