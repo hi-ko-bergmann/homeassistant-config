@@ -1,12 +1,36 @@
+### Modbus Configuration for Varta Battery
+# Currently there are two Modbus Masters (Solarwatt Energy Manager and Home Assistant) which
+# need to access the Varta Battery. To avoid collisions, a Modbus Proxy is used to manage access
+# to the battery.
+# The Modbus Proxy is running on a NAS (Synology DS218+) in a docker container.
+# The following docker image is used: https://hub.docker.com/r/tiagocoutinho/modbus-proxy/
+# With the following compose.yaml:
+# services:
+#  modbus-proxy:
+#    image: tiagocoutinho/modbus-proxy:latest
+#    container_name: varta-modbus-proxy
+#    restart: unless-stopped
+#
+#    ports:
+#      - "502:1502"
+#
+#    volumes:
+#      - ./config.yml:/etc/modbus-proxy.yml
+# And the following config.yml:
+# devices:
+#  - modbus:
+#      url: 192.168.178.23:502
+#    listen:
+#      bind: 0:1502
 - name: varta
   type: tcp
-  host: 192.168.178.23   # IP deiner Varta
+#  host: 192.168.178.23   # IP of Varta Battery (not used, because of Modbus Proxy)
+  host: 192.168.178.26   # IP of Modbus Proxy
   port: 502
   delay: 3
   timeout: 10
   retries: 5
   message_wait_milliseconds: 2000
-  scan_interval: 120  # Nur alle 2 Minuten Werte abfragen, um Kollision mit Solarwatt Energy Manager zu vermeiden
   sensors:
 ### EMS Software Version - not for Varta link
 #      - name: mb_varta_sw_version_EMS
@@ -150,7 +174,6 @@
   delay: 1
   timeout: 5
   retries: 3
-  scan_interval: 60  # Erhöht auf 60 Sekunden für schnelleren Start
   sensors:
 ### Raw AC Power Value (Register 40084)
     - name: mb_kaco_ac_power_raw
