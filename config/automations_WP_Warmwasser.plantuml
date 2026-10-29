@@ -9,20 +9,20 @@ state Solltemp2_AUS : Shelly Switch ist AUS
 state Solltemp2_EIN : Shelly Switch ist EIN
 
 
-Solltemp2_AUS --down--> Solltemp2_EIN : Einspeiseleistung_fuer_10min_ueber_2800W()
+Solltemp2_AUS --down--> Solltemp2_EIN : Netzeinspeisung_fuer_10min_ueber_2800W()
 note on link 
-  HA Automation "WP WW Solltemp 2 beim Einspeisen Einschalten"
+  HA Automation "WP WW Solltemp 2 bei hoher Netzeinspeisung Einschalten"
 end note
 Solltemp2_AUS --down--> Solltemp2_EIN : ÄnderungStrompreis() [price_current < price_threshold_low]
 note on link 
   HA Automation "WP WW Solltemp 2 bei niedrigem Strompreis"
 end note
 
-Solltemp2_EIN --up--> Solltemp2_AUS : Einspeiseleistung_fuer_5min_unter_200W() [price_current > price_threshold_low]
+Solltemp2_EIN --up--> Solltemp2_AUS : Netzeinspeisung_fuer_5min_unter_200W() [price_current > price_threshold_low]
 note on link 
-  HA Automation "WP WW Solltemp 2 beim Einspeisen Ausschalten"
+  HA Automation "WP WW Solltemp 2 bei geringer Netzeinspeisung Ausschalten"
 end note
-Solltemp2_EIN --up--> Solltemp2_AUS : ÄnderungStrompreis() [(price_current > price_threshold_low) && (Einspeiseleistung < 200W)]
+Solltemp2_EIN --up--> Solltemp2_AUS : ÄnderungStrompreis() [(price_current > price_threshold_low) && (Netzeinspeisung < 200W)]
 note on link 
   HA Automation "WP WW Solltemp 2 bei niedrigem Strompreis"
 end note

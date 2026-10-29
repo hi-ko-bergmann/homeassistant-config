@@ -72,6 +72,29 @@ template:
             0
           {% endif %}
 
+      # Varta Grid Power - positive means feed-in; negative means consumption
+      - name: "Grid Feed-in Power"
+        unique_id: grid_feed_in_power
+        unit_of_measurement: "W"
+        state_class: measurement
+        device_class: power
+        state: >
+          {% set grid_power = states('sensor.mb_varta_grid_power') | float(0) %}
+          {{ grid_power if grid_power > 0 else 0 }}
+        availability: >
+          {{ states('sensor.mb_varta_grid_power') not in ['unavailable', 'unknown'] }}
+
+      - name: "Grid Power Consumption"
+        unique_id: grid_power_consumption
+        unit_of_measurement: "W"
+        state_class: measurement
+        device_class: power
+        state: >
+          {% set grid_power = states('sensor.mb_varta_grid_power') | float(0) %}
+          {{ (-grid_power) if grid_power < 0 else 0 }}
+        availability: >
+          {{ states('sensor.mb_varta_grid_power') not in ['unavailable', 'unknown'] }}
+
       - name: "Varta Status"
         unique_id: varta_status
         state: >

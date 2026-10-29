@@ -1,7 +1,7 @@
 - id: '1746171015275'
-  alias: WP WW Solltemp 2 beim Einspeisen Einschalten
-  description: 'Steigt die Einspeiseleistung über 2800 W (obere Schwelle Hysterese
-    WP) wird das Relay für die Solltemperatur 2 eingeschaltet.
+  alias: WP WW Solltemp 2 bei hoher Netzeinspeisung Einschalten
+  description: 'Steigt die Netzeinspeisung über 2800 W (obere Schwelle Hysterese WP),
+    wird das Relay für die Solltemperatur 2 eingeschaltet.
 
     Hinweis: Zusätzlich wird noch geprüft, ob die Schwelle für 10 min überschritten
     wurde. Damit wird sichergestellt, dass nicht sofort wieder bei einer Wolke oder
@@ -13,7 +13,7 @@
   triggers:
   - trigger: numeric_state
     entity_id:
-    - sensor.tibber_pulse_myhome_einspeiseleistung
+    - sensor.grid_feed_in_power
     above: 2800
     for:
       hours: 0
@@ -36,9 +36,9 @@
     title: Notify Boiled Water Setpoint Temp 2 activated
   mode: single
 - id: '1746171484230'
-  alias: WP WW Solltemp 2 beim Einspeisen Ausschalten
-  description: 'Sinkt die Einspeiseleistung unter 200 W (untere Schwelle Hysterese
-    WP) wird das Relay für die Solltemperatur 2 wieder ausgeschaltet.
+  alias: WP WW Solltemp 2 bei geringer Netzeinspeisung Ausschalten
+  description: 'Sinkt die Netzeinspeisung unter 200 W (untere Schwelle Hysterese WP),
+    wird das Relay für die Solltemperatur 2 wieder ausgeschaltet.
 
     Hinweis: Bei günstigem Strompreis wird das Relay nicht ausgeschaltet.
 
@@ -47,7 +47,7 @@
   triggers:
   - trigger: numeric_state
     entity_id:
-    - sensor.tibber_pulse_myhome_einspeiseleistung
+    - sensor.grid_feed_in_power
     below: 200
     for:
       hours: 0
@@ -139,10 +139,9 @@
     Tibber-Strompreis 20 % unter dem 24h-Durchschnitt liegt, und wieder aus, wenn
     er wieder darüber ist.
 
-    Hinweis: Das Relay wird nur ausgeschaltet, wenn die Einspeiseleistung kleiner
-    200 W (unterere Schwelle Hysterie Wärmepumpe). Damit wird sichergestellt, dass
-    bei genügend Sonnenertrag weiterhin sehr warmes Wasser aufbereitet wird, auch
-    wenn der Strompreis steigt.'
+    Hinweis: Das Relay wird nur ausgeschaltet, wenn die Netzeinspeisung kleiner
+    200 W ist. Damit wird sichergestellt, dass bei ausreichender Einspeisung weiterhin
+    sehr warmes Wasser aufbereitet wird, auch wenn der Strompreis steigt.'
   triggers:
   - entity_id: sensor.price_current_float
     trigger: state
@@ -177,7 +176,7 @@
           entity_id: sensor.price_current_float
           above: sensor.price_threshold_low_float
         - condition: numeric_state
-          entity_id: sensor.tibber_pulse_myhome_einspeiseleistung
+          entity_id: sensor.grid_feed_in_power
           below: 200
       sequence:
       - target:
@@ -190,22 +189,6 @@
         title: WP WW Solltemperatur 2 ausgeschaltet
         message: WP WW Solltemperatur 2 ausgeschaltet - Strompreis wieder gestiegen
   mode: single
-# Alte Lösung - triggert nur bei Zustandswechsel zu unavailable, nicht bei anhaltendem unavailable
-# - id: '1767470950100'
-#   alias: Tibber Strompreis Reload
-#   description: Lädt Tibber Integration neu wenn Strompreis länger als 5 Min unavailable
-#   triggers:
-#     - entity_id: sensor.myhome_strompreis
-#       to: "unavailable"
-#       for:
-#         minutes: 5
-#       trigger: state
-#   conditions: []
-#   actions:
-#     - action: homeassistant.reload_config_entry
-#       data:
-#         entry_id: 01KMDR80A1XYHV165K24S86W4P
-#   mode: single
 - id: '1767470950100'
   alias: Tibber Strompreis Reload
   description: Lädt Tibber Integration neu wenn Strompreis länger als 5 Min unavailable. Prüft alle 5 Minuten ob Sensor unavailable ist.
